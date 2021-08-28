@@ -1,4 +1,4 @@
-package main
+package deviceplugin
 
 import (
 	"fmt"
@@ -52,7 +52,7 @@ func (c HostPathMountSpec) Mount() pluginapi.Mount {
 	}
 }
 
-func mustLoadConfig(configPath string) HostPathDevicePluginConfig {
+func MustLoadConfig(configPath string) HostPathDevicePluginConfig {
 	logger := log.With().Str("ConfigFile", configPath).Logger()
 
 	raw, err := ioutil.ReadFile(configPath)

@@ -1,4 +1,4 @@
-package main
+package deviceplugin
 
 import (
 	"context"
@@ -179,7 +179,7 @@ func (m *HostPathDevicePlugin) Allocate(ctx context.Context, request *pluginapi.
 	log.Debug().Interface("AllocateRequest", request).Msg("Start Allocate()")
 
 	containerResponses := make([]*pluginapi.ContainerAllocateResponse, len(request.GetContainerRequests()))
-	for i, _ := range request.GetContainerRequests() {
+	for i := range request.GetContainerRequests() {
 		m := m.config.Spec.Mount()
 		containerResponses[i] = &pluginapi.ContainerAllocateResponse{
 			Mounts: []*pluginapi.Mount{&m},

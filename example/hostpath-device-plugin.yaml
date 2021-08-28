@@ -26,7 +26,8 @@ spec:
         imagePullPolicy: IfNotPresent
         name: ctr
         args: 
-        - -debug
+        - deviceplugin
+        - --debug
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
