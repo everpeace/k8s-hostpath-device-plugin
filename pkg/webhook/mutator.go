@@ -16,7 +16,7 @@ type hostPathMutator struct {
 	cfg config.HostPathDevicePluginConfig
 }
 
-func NewMutator(cfg config.HostPathDevicePluginConfig) kwhmutating.Mutator {
+func newMutator(cfg config.HostPathDevicePluginConfig) kwhmutating.Mutator {
 	return &hostPathMutator{cfg: cfg}
 }
 

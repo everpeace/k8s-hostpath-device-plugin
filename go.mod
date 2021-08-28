@@ -9,7 +9,6 @@ require (
 	github.com/slok/kubewebhook/v2 v2.1.0
 	github.com/spf13/cobra v1.2.1
 	google.golang.org/grpc v1.40.0
-	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.21.3
 	k8s.io/apimachinery v0.21.3
 	k8s.io/kubelet v0.21.3
@@ -38,6 +37,7 @@ require (
 	google.golang.org/genproto v0.0.0-20210602131652-f16073e35f0c // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/client-go v0.21.3 // indirect
 	k8s.io/klog/v2 v2.8.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
