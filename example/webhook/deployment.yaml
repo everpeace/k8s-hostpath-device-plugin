@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook
+  namespace: system
+  labels:
+    app.kubernetes.io/component: webhook
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: webhook
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: webhook
+    spec:
+      containers:
+      - name: ctr
+        image: k8s-hostpath-device-plugin
+        imagePullPolicy: IfNotPresent
+        args: 
+        - webhook
+        - --debug
+        ports:
+        - containerPort: 8443
+          name: webhook-server
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /cert
+          name: cert
+          readOnly: true
+        - name: config
+          mountPath: /k8s-hostpath-device-plugin
+          readOnly: true
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: webhook-server-cert
+      - name: config
+        configMap:
+          name: hostpath-sample-device-config

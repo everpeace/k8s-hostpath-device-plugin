@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/everpeace/k8s-hostpath-device-plugin/pkg/config"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	pluginapi "k8s.io/kubelet/pkg/apis/deviceplugin/v1beta1"
@@ -18,7 +19,7 @@ var (
 
 // NewHostPathDevicePlugin implements the Kubernetes device plugin API
 type HostPathDevicePlugin struct {
-	config HostPathDevicePluginConfig
+	config config.HostPathDevicePluginConfig
 	devs   []*pluginapi.Device
 	stop   chan interface{}
 	health chan string
@@ -26,23 +27,23 @@ type HostPathDevicePlugin struct {
 }
 
 // NewHostPathDevicePlugin returns an initialized NewHostPathDevicePlugin
-func NewHostPathDevicePlugin(config HostPathDevicePluginConfig) (*HostPathDevicePlugin, error) {
-	var devs = make([]*pluginapi.Device, config.NumDevices)
-	health := getHostPathHealth(config.Spec.HostPath)
-	for i := range devs {
-		devs[i] = &pluginapi.Device{
+func NewHostPathDevicePlugin(cfg config.HostPathDevicePluginConfig) (*HostPathDevicePlugin, error) {
+	dp := &HostPathDevicePlugin{
+		config: cfg,
+		devs:   make([]*pluginapi.Device, cfg.NumDevices),
+		stop:   make(chan interface{}),
+		health: make(chan string),
+	}
+
+	health := dp.getHostPathHealth()
+	for i := range dp.devs {
+		dp.devs[i] = &pluginapi.Device{
 			ID:     fmt.Sprint(i),
 			Health: health,
 		}
 	}
 
-	return &HostPathDevicePlugin{
-		config: config,
-		devs:   devs,
-		stop:   make(chan interface{}),
-		health: make(chan string),
-	}, nil
-
+	return dp, nil
 }
 
 // dial establishes the gRPC communication with the registered device plugin.
@@ -61,11 +62,11 @@ func dial(unixSocketPath string, timeout time.Duration) (*grpc.ClientConn, error
 	return c, nil
 }
 
-func getHostPathHealth(hostPath string) string {
+func (m *HostPathDevicePlugin) getHostPathHealth() string {
 	health := pluginapi.Healthy
-	if _, err := os.Stat(hostPath); os.IsNotExist(err) {
+	if _, err := os.Stat(m.config.HostPath.Path); os.IsNotExist(err) {
 		health = pluginapi.Unhealthy
-		log.Warn().Str("HostPath", hostPath).Msg("HostPath not found")
+		log.Warn().Str("HostPath", m.config.HostPath.Path).Msg("HostPath not found")
 	}
 	return health
 }
@@ -158,10 +159,10 @@ func (m *HostPathDevicePlugin) healthCheck() {
 	for {
 		select {
 		case <-ticker.C:
-			health := getHostPathHealth(m.config.Spec.HostPath)
+			health := m.getHostPathHealth()
 			if lastHealth != health {
 				log.Info().
-					Str("HostPath", m.config.Spec.HostPath).
+					Str("HostPath", m.config.HostPath.Path).
 					Str("LastHealth", lastHealth).
 					Str("Health", health).Msg("Health is changed")
 				m.health <- health
@@ -180,20 +181,19 @@ func (m *HostPathDevicePlugin) Allocate(ctx context.Context, request *pluginapi.
 
 	containerResponses := make([]*pluginapi.ContainerAllocateResponse, len(request.GetContainerRequests()))
 	for i := range request.GetContainerRequests() {
-		m := m.config.Spec.Mount()
-		containerResponses[i] = &pluginapi.ContainerAllocateResponse{
-			Mounts: []*pluginapi.Mount{&m},
-		}
+		// this returns empty container allocate response
+		// because webhook declares hostPath volume and volumeMounts to the Pods
+		containerResponses[i] = &pluginapi.ContainerAllocateResponse{}
 	}
 
 	response := pluginapi.AllocateResponse{
 		ContainerResponses: containerResponses,
 	}
+
 	log.Debug().
 		Interface("AllocateRequest", request).
 		Interface("AllocateResponse", response).
 		Msg("Finish Allocate()")
-
 	return &response, nil
 }
 
@@ -215,7 +215,6 @@ func (m *HostPathDevicePlugin) cleanup() error {
 	if err := os.Remove(m.config.Socket()); err != nil && !os.IsNotExist(err) {
 		return err
 	}
-
 	return nil
 }
 

@@ -4,8 +4,9 @@ resourceName: hostpath-device.k8s.io/sample
 socketName: hostpath-device.k8s.io-sample.sock
 # the number of extended resource that the device plugin serves
 numDevices: 100
-# mount spec for this extended resource
-spec:
-  hostPath: /sample
-  containerPath: /sample
+hostPath: 
+  path: /sample
+  type: Directory
+volumeMount:
+  mountPath: /sample
   readOnly: false

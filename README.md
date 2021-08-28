@@ -29,7 +29,7 @@ kind: Pod
         hostpath-device.k8s.io/sample: 1
 ```
 
-Then, it can guarantee that the pod will be scheduled to a node which has the host path.
+Thus, it can guarantee that the pod will be scheduled to a node which has the host path.
 
 ## Build
 
@@ -48,26 +48,20 @@ kustomize build example/ | kubectl apply -f -
 ## Try with Kind
 
 ```shell
-# build
-$ docker build . -t k8s-hostpath-device-plugin
+# create a kind cluster
+# - create kind cluster
+# - prepare hostpath=/sample
+# - install cert-manager
+$ make dev-cluster
 
-# create single-node cluster
-$ kind create cluster
-
-# load docker image
-$ kind load docker-image k8s-hostpath-device-plugin
-
-# prepare hostPath /sample on node
-$ docker exec kind-control-plane sh -c 'mkdir -p /sample && echo "hello" > /sample/hello'
-
-# deploy k8s-hostpath-device-plugin that serves resource="hostpath-device.k8s.io/sample"
-# "hostpath-device.k8s.io/sample" will mount hostPath=/sample to containerPath=/sample
-$ kustomize build example/ | kubectl apply -f -
+# deploy
+# - k8s-hostpath-device-plugin
+# - its webhook
+$ make dev-deploy
 ```
 
 ```shell
 # create pod requesting 'hostpath-device.k8s.io/sample=1'
-
 $ cat << EOT | kubectl apply -f -
 apiVersion: v1
 kind: Pod
@@ -82,10 +76,9 @@ spec:
     - sh
     - -c
     - |
-      set -x
+      set -ex
       ls -al /sample
       cat /sample/hello
-      exit 0
     resources:
       limits:
         # the resource mounts hostPath=/sample to contianerPath=/sample
@@ -104,6 +97,5 @@ hello
 + exit 0
 
 # cleanup
-$ kubectl delete pod  test-hostpath-sample
-$ kind delete cluster
+$ make dev-clean
 ```
