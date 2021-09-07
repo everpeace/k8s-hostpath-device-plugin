@@ -38,7 +38,7 @@ jobs:
     - name: Test
       run: make test
     - name: E2E Test
-      run: make e2e
+      run: make e2e-test
     - name: Validate .goreleaser.yml
       uses: goreleaser/goreleaser-action@v2
       with:
@@ -50,27 +50,28 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
-      IMAGE_PREFIX: docker.pkg.github.com/${{ github.repository }}/
     steps:
-      - name: Set up Go 1.x
-        uses: actions/setup-go@v2
-        with:
-          go-version: ^1.16
-        id: go
-      - name: Check out
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Get Devtools
-        run: make setup
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build Docker image
-        run: make build-image
-      - name: Push Docker image only when pushed on main branch
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: make push-image
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.16
+      id: go
+    - name: Check out
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Get Devtools
+      run: make setup
+    - name: Lint
+      run : make lint
+    - name: Build Docker image
+      run: make build-image
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Push Docker image only when pushed on main branch
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: make push-image

@@ -41,7 +41,11 @@ build-only:
 
 .PHONY: test
 test: fmt lint
-	go test  ./...
+	go test  ./cmd/... ./pkg/...
+
+.PHONY: e2e-test
+e2e-test: dev-cluster dev-deploy
+	go test ./e2e --kubeconfig=../.dev/kubeconfig --pluginconfig=../example/config.yaml
 
 .PHONY: clean
 clean:
@@ -115,10 +119,6 @@ dev-deploy: build-image
 		-n hostpath-sample-device-plugin \
 		hostpath-sample-device-plugin-ds \
 		--timeout 60s
-
-.PHONY: e2e
-e2e: dev-cluster dev-deploy
-	go test ./e2e --kubeconfig=../.dev/kubeconfig --pluginconfig=../example/config.yaml
 
 .PHONY: dev-clean
 dev-clean:
