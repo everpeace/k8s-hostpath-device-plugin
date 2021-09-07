@@ -20,8 +20,8 @@ setup:
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.27.0 && \
 	go install github.com/linyows/git-semv/cmd/git-semv@latest && \
 	go install sigs.k8s.io/kind@latest && \
-	curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/kustomize/v4.3.0/hack/install_kustomize.sh" | bash && \
-	curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+	curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/kustomize/v4.3.0/hack/install_kustomize.sh" | bash -s -- $(shell go env GOPATH)/bin && \
+	curl -s https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
 .PHONY: fmt
 fmt:
