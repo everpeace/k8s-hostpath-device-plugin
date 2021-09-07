@@ -28,9 +28,9 @@ type HostPathDevicePluginConfig struct {
 	// SocketName defines a filename of unix socket to be created that the device plugin listens
 	SocketName string `yaml:"socketName" validate:"required"`
 	// HostPath specifies the host path volume that the plugin serves as a extended resource
-	HostPath corev1.HostPathVolumeSource `yaml:"hostPath" validate:"-"`
+	HostPath corev1.HostPathVolumeSource `yaml:"hostPath"`
 	// VolumeMount specifies how the extended resource mounts the HostPath to containers.  Name field will be ignored.
-	VolumeMount corev1.VolumeMount `yaml:"volumeMount" validate:"-"`
+	VolumeMount corev1.VolumeMount `yaml:"volumeMount"`
 	// NumDevices specifies how many extended resource the device plugin serves
 	NumDevices int `yaml:"numDevices" validate:"min=1"`
 	// HealthCheckInterval specifies the healthcheck interval of the Spec.HostPath
@@ -42,7 +42,7 @@ func (c HostPathDevicePluginConfig) Socket() string {
 }
 
 func (c HostPathDevicePluginConfig) HostPathVolumeName() string {
-	return "hostpath-device-volume-" + regexp.MustCompile(`[./]`).ReplaceAllString(string(c.ResourceName), "-")
+	return "hostpath-device-volume-" + regexp.MustCompile(`[./]`).ReplaceAllString(c.ResourceName, "-")
 }
 
 func MustLoadConfig(configPath string) HostPathDevicePluginConfig {

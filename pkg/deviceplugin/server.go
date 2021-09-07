@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/everpeace/k8s-hostpath-device-plugin/pkg/config"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	pluginapi "k8s.io/kubelet/pkg/apis/deviceplugin/v1beta1"
@@ -24,6 +25,7 @@ type HostPathDevicePlugin struct {
 	stop   chan interface{}
 	health chan string
 	server *grpc.Server
+	logger zerolog.Logger
 }
 
 // NewHostPathDevicePlugin returns an initialized NewHostPathDevicePlugin
@@ -33,6 +35,7 @@ func NewHostPathDevicePlugin(cfg config.HostPathDevicePluginConfig) (*HostPathDe
 		devs:   make([]*pluginapi.Device, cfg.NumDevices),
 		stop:   make(chan interface{}),
 		health: make(chan string),
+		logger: log.With().Str("ResourceName", cfg.ResourceName).Logger(),
 	}
 
 	health := dp.getHostPathHealth()
@@ -48,10 +51,12 @@ func NewHostPathDevicePlugin(cfg config.HostPathDevicePluginConfig) (*HostPathDe
 
 // dial establishes the gRPC communication with the registered device plugin.
 func dial(unixSocketPath string, timeout time.Duration) (*grpc.ClientConn, error) {
-	c, err := grpc.Dial(unixSocketPath, grpc.WithInsecure(), grpc.WithBlock(),
-		grpc.WithTimeout(timeout),
-		grpc.WithDialer(func(addr string, timeout time.Duration) (net.Conn, error) {
-			return net.DialTimeout("unix", addr, timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	c, err := grpc.DialContext(ctx, unixSocketPath, grpc.WithInsecure(), grpc.WithBlock(),
+		grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
+			var dialer net.Dialer
+			return dialer.DialContext(ctx, "unix", addr)
 		}),
 	)
 
@@ -86,7 +91,9 @@ func (m *HostPathDevicePlugin) Start() error {
 	m.server = grpc.NewServer([]grpc.ServerOption{}...)
 	pluginapi.RegisterDevicePluginServer(m.server, m)
 
-	go m.server.Serve(socket)
+	go func() {
+		_ = m.server.Serve(socket)
+	}()
 
 	// Wait for server to start by launching a blocking connexion
 	conn, err := dial(m.config.Socket(), 5*time.Second)
@@ -147,7 +154,10 @@ func (m *HostPathDevicePlugin) ListAndWatch(e *pluginapi.Empty, s pluginapi.Devi
 				dev.Health = health
 			}
 			log.Info().Interface("Devices", m.devs).Msg("Exposing devices")
-			s.Send(&pluginapi.ListAndWatchResponse{Devices: m.devs})
+			if err := s.Send(&pluginapi.ListAndWatchResponse{Devices: m.devs}); err != nil {
+				m.logger.Error().Err(err).Str("Method", "ListAndWatch").Msg("Failed to send device list")
+				return err
+			}
 		}
 	}
 }
@@ -220,23 +230,21 @@ func (m *HostPathDevicePlugin) cleanup() error {
 
 // Serve starts the gRPC server and register the device plugin to Kubelet
 func (m *HostPathDevicePlugin) Serve() error {
-	logger := log.With().Str("ResourceName", m.config.ResourceName).Logger()
-
 	err := m.Start()
 	if err != nil {
 		log.Error().Err(err).Msg("Could not start device plugin")
 		return err
 	}
 
-	logger.Info().Str("Socket", m.config.Socket()).Msg("Starting to serve on")
+	m.logger.Info().Str("Socket", m.config.Socket()).Msg("Starting to serve on")
 
 	err = m.Register(pluginapi.KubeletSocket, m.config.ResourceName)
 	if err != nil {
-		logger.Error().Err(err).Msg("Failed to register device plugin")
-		m.Stop()
+		m.logger.Error().Err(err).Msg("Failed to register device plugin")
+		_ = m.Stop()
 		return err
 	}
 
-	logger.Info().Msg("Registered device plugin with Kubelet")
+	m.logger.Info().Msg("Registered device plugin with Kubelet")
 	return nil
 }

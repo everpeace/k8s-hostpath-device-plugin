@@ -13,34 +13,40 @@ resources:
 - webhook/
 
 configMapGenerator:
-- name: hostpath-sample-device-config
-  files:
+- files:
   - config.yaml
+  name: hostpath-sample-device-config
 
 vars:
-- name: CERTIFICATE_NAMESPACE
+- fieldref:
+    fieldPath: metadata.namespace
+  name: CERTIFICATE_NAMESPACE
   objref:
-    kind: Certificate
     group: cert-manager.io
-    version: v1
+    kind: Certificate
     name: serving-cert
-  fieldref:
-    fieldpath: metadata.namespace
-- name: CERTIFICATE_NAME
+    version: v1
+- fieldref: {}
+  name: CERTIFICATE_NAME
   objref:
-    kind: Certificate
     group: cert-manager.io
-    version: v1
+    kind: Certificate
     name: serving-cert
-- name: SERVICE_NAMESPACE
+    version: v1
+- fieldref:
+    fieldPath: metadata.namespace
+  name: SERVICE_NAMESPACE
   objref:
     kind: Service
-    version: v1
     name: webhook-service
-  fieldref:
-    fieldpath: metadata.namespace
-- name: SERVICE_NAME
+    version: v1
+- fieldref: {}
+  name: SERVICE_NAME
   objref:
     kind: Service
-    version: v1
     name: webhook-service
+    version: v1
+images:
+- name: k8s-hostpath-device-plugin
+  newName: ghcr.io/everpeace/k8s-hostpath-device-plugin
+  newTag: v0.0.1-alpha.0-6ee6a6e

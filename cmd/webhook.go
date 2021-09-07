@@ -20,6 +20,7 @@ var webhookCmd = &cobra.Command{
 	Short: "start webhook",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		mustLoadConfig()
 		log.Info().Interface("Config", whCfg).Msg("Loaded webhook server config")
 		server := webhook.NewServer(cfg, whCfg)
 		if err := server.Start(); err != nil {

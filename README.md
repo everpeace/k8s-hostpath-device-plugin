@@ -99,3 +99,16 @@ hello
 # cleanup
 $ make dev-clean
 ```
+
+## How to make a release
+
+`release` make target tags a commit and push the tag to `origin`. Release process will run in GitHub Action.
+
+```shell
+$ RELEASE_TAG=$(git semv patch) # next patch version.  bump major/minor version if necessary
+$ make release RELEASE=true RELEASE_TAG=${RELEASE_TAG}
+```
+
+## License
+
+MIT License.  See [LICENSE](LICENSE) file.

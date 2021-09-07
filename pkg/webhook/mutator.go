@@ -2,21 +2,26 @@ package webhook
 
 import (
 	"context"
+	"strings"
 
 	"github.com/everpeace/k8s-hostpath-device-plugin/pkg/config"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	kwhmodel "github.com/slok/kubewebhook/v2/pkg/model"
 	kwhmutating "github.com/slok/kubewebhook/v2/pkg/webhook/mutating"
+
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+var _ kwhmutating.Mutator = &hostPathMutator{}
 
 type hostPathMutator struct {
 	cfg config.HostPathDevicePluginConfig
 }
 
-func newMutator(cfg config.HostPathDevicePluginConfig) kwhmutating.Mutator {
+func NewMutator(cfg config.HostPathDevicePluginConfig) kwhmutating.Mutator {
 	return &hostPathMutator{cfg: cfg}
 }
 
@@ -29,6 +34,10 @@ func (m *hostPathMutator) Mutate(_ context.Context, r *kwhmodel.AdmissionReview,
 		return &kwhmutating.MutatorResult{}, nil
 	}
 	logger := log.With().Str("Pod", pod.Namespace+"/"+pod.Name).Logger()
+
+	if err := m.validateNoTargetHostPathVolume(pod.Spec); err != nil {
+		return nil, err
+	}
 
 	volumeName := m.cfg.HostPathVolumeName()
 	found := false
@@ -73,4 +82,17 @@ func (m *hostPathMutator) isContainerRequestHostPathDevice(c corev1.Container) b
 		return false
 	}
 	return checkResourceList(c.Resources.Requests) || checkResourceList(c.Resources.Limits)
+}
+
+func (m *hostPathMutator) validateNoTargetHostPathVolume(podSpec corev1.PodSpec) error {
+	for _, v := range podSpec.Volumes {
+		if v.HostPath != nil && strings.HasPrefix(v.HostPath.Path, m.cfg.HostPath.Path) {
+			return errors.Errorf(
+				"Forbid to declare a volume with hostPath.path=%s. Request %s resource instead",
+				m.cfg.HostPath.Path,
+				m.cfg.ResourceName,
+			)
+		}
+	}
+	return nil
 }

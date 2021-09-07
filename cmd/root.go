@@ -31,9 +31,11 @@ var rootCmd = &cobra.Command{
 		if logPretty {
 			log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 		}
-
-		cfg = config.MustLoadConfig(configFilePath)
 	},
+}
+
+func mustLoadConfig() {
+	cfg = config.MustLoadConfig(configFilePath)
 }
 
 func Execute() {

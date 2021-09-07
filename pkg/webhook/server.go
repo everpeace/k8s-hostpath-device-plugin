@@ -32,7 +32,7 @@ func (s *Server) Start() error {
 	wh, err := kwhmutating.NewWebhook(kwhmutating.WebhookConfig{
 		ID:      "hostPathDevice",
 		Obj:     &corev1.Pod{},
-		Mutator: newMutator(s.cfg),
+		Mutator: NewMutator(s.cfg),
 		Logger:  kwhLogger,
 	})
 	if err != nil {
@@ -42,7 +42,6 @@ func (s *Server) Start() error {
 	mux := http.NewServeMux()
 	respondOK := func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		return
 	}
 	mux.HandleFunc("/", respondOK)
 	mux.Handle("/mutating", kwhhttp.MustHandlerFor(kwhhttp.HandlerConfig{Webhook: wh, Logger: kwhLogger}))

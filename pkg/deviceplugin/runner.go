@@ -42,7 +42,9 @@ func (r *Runner) Run() {
 	for {
 		if restart {
 			if devicePlugin != nil {
-				devicePlugin.Stop()
+				if err := devicePlugin.Stop(); err != nil {
+					log.Fatal().Err(err).Msg("Failed to stop HostPath device plugin")
+				}
 			}
 
 			devicePlugin, err := NewHostPathDevicePlugin(r.cfg)

@@ -15,6 +15,7 @@ var devicepluginCmd = &cobra.Command{
 	Use:   "deviceplugin",
 	Short: "start device plugin",
 	Run: func(cmd *cobra.Command, args []string) {
+		mustLoadConfig()
 		log.Info().Msg("Starging K8s HostPath Device Plugin")
 		dp.MustNewRunner(cfg).Run()
 	},
