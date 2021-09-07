@@ -14,8 +14,8 @@ on:
     paths-ignore: [ "**.md" ]
 
 jobs:
-  test:
-    name: Test
+  unit-test:
+    name: Unit Test
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.x
@@ -35,11 +35,48 @@ jobs:
       run : make lint
     - name: Build
       run: make
-    - name: Test
+    - name: Unit Test
       run: make test
+    - name: Validate .goreleaser.yml
+      uses: goreleaser/goreleaser-action@v2
+      with:
+        version: latest
+        args: release --snapshot --skip-publish --rm-dist --debug
+
+  e2e-test:
+    name: E2E Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.17
+      id: go
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Get dependencies
+      run: go mod download
+    - name: Get Devtools
+      run: make setup
     - name: E2E Test
       run: make e2e-test
-    - name: Validate .goreleaser.yml
+
+  validate-goreleaser-yml:
+    name: Validate .goreleaser.yml
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.17
+      id: go
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Validate
       uses: goreleaser/goreleaser-action@v2
       with:
         version: latest
@@ -62,8 +99,8 @@ jobs:
         fetch-depth: 0
     - name: Get Devtools
       run: make setup
-    - name: Lint
-      run : make lint
+    - name: Unit Test
+      run : make test
     - name: Build Docker image
       run: make build-image
     - name: Login to GitHub Container Registry
