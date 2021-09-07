@@ -53,11 +53,6 @@ jobs:
       run: make setup
     - name: Unit Test
       run: make test
-    - name: Validate .goreleaser.yml
-      uses: goreleaser/goreleaser-action@v2
-      with:
-        version: latest
-        args: release --snapshot --skip-publish --rm-dist --debug
 
   e2e-test:
     name: E2E Test
