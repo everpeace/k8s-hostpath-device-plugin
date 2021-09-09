@@ -60,16 +60,20 @@ func (r *Runner) Run() {
 		}
 
 		select {
-		case event := <-r.fsWatcher.Events:
-			if event.Name == pluginapi.KubeletSocket && event.Op&fsnotify.Create == fsnotify.Create {
-				log.Info().
-					Str("KubeletSocket", pluginapi.KubeletSocket).
-					Msg("inotify: detected KubeletSocket created.  Restarting K8s HostPath Device Plugin")
-				restart = true
+		case event, ok := <-r.fsWatcher.Events:
+			if ok {
+				if event.Name == pluginapi.KubeletSocket && event.Op&fsnotify.Create == fsnotify.Create {
+					log.Info().
+						Str("KubeletSocket", pluginapi.KubeletSocket).
+						Msg("inotify: detected KubeletSocket created.  Restarting K8s HostPath Device Plugin")
+					restart = true
+				}
 			}
 
-		case err := <-r.fsWatcher.Errors:
-			log.Error().Err(err).Msg("inotify: got error")
+		case err, ok := <-r.fsWatcher.Errors:
+			if ok {
+				log.Error().Err(err).Msg("inotify: got error")
+			}
 
 		case s := <-r.sigCh:
 			switch s {
