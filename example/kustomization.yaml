@@ -49,4 +49,4 @@ vars:
 images:
 - name: k8s-hostpath-device-plugin
   newName: ghcr.io/everpeace/k8s-hostpath-device-plugin
-  newTag: v0.0.1-alpha.0-6ee6a6e
+  newTag: v0.1.2-alpha.0-b6559d2
