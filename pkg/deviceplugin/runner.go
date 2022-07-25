@@ -25,7 +25,6 @@ func MustNewRunner(
 	if err != nil {
 		log.Fatal().Str("Path", pluginapi.DevicePluginPath).Err(err).Msg("Failed to create filesystem watcher")
 	}
-	defer fsWatcher.Close()
 
 	log.Info().Msg("Starting signal watcher.")
 	sigCh := watcher.NewSignalWatcher(syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
@@ -85,6 +84,7 @@ func (r *Runner) Run() {
 				if err := devicePlugin.Stop(); err != nil {
 					log.Fatal().Err(err).Msg("Failed to shutdown")
 				}
+				r.fsWatcher.Close()
 				log.Info().Msg("Shutdown successfully")
 				os.Exit(0)
 			}
