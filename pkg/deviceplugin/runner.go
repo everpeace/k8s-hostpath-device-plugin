@@ -47,7 +47,8 @@ func (r *Runner) Run() {
 				}
 			}
 
-			devicePlugin, err := NewHostPathDevicePlugin(r.cfg)
+			var err error
+			devicePlugin, err = NewHostPathDevicePlugin(r.cfg)
 			if err != nil {
 				log.Fatal().Err(err).Msg("Failed to initialize HostPath device plugin")
 			}
