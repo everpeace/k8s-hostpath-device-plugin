@@ -102,12 +102,7 @@ $ make dev-clean
 
 ## How to make a release
 
-`release` make target tags a commit and push the tag to `origin`. Release process will run in GitHub Action.
-
-```shell
-$ RELEASE_TAG=$(git semv patch) # next patch version.  bump major/minor version if necessary
-$ make release RELEASE=true RELEASE_TAG=${RELEASE_TAG}
-```
+The release process is fully automated by [tagpr](https://github.com/Songmu/tagpr). To release, just merge [the latest release PR](https://github.com/everpeace/k8s-hostpath-device-plugin/pulls?q=is%3Apr+is%3Aopen+label%3Atagpr).
 
 ## License
 

@@ -2,9 +2,6 @@ FROM golang:1.18 as build
 ARG CGO_ENABLED=0
 ARG GOOS=linux
 ARG GOARCH=amd64
-ARG RELEASE
-ARG VERSION
-ARG REVISION
 WORKDIR /workspace
 COPY go.mod go.mod
 COPY go.sum go.sum
