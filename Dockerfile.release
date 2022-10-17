@@ -1,0 +1,3 @@
+FROM gcr.io/distroless/base-debian10 as runtime
+COPY k8s-hostpath-device-plugin /bin/k8s-hostpath-device-plugin
+ENTRYPOINT ["/bin/k8s-hostpath-device-plugin"]
