@@ -1,4 +1,4 @@
-FROM golang:1.17 as build
+FROM golang:1.18 as build
 ARG CGO_ENABLED=0
 ARG GOOS=linux
 ARG GOARCH=amd64
