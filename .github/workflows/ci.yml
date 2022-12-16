@@ -18,11 +18,10 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-    - name: Set up Go 1.x
+    - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: ~1.18
-      id: go
+        go-version-file: 'go.mod'
     - name: Check out code into the Go module directory
       uses: actions/checkout@v3
     - name: Get dependencies
@@ -36,11 +35,10 @@ jobs:
     name: Unit Test
     runs-on: ubuntu-latest
     steps:
-    - name: Set up Go 1.x
+    - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: ~1.18
-      id: go
+        go-version-file: 'go.mod'
     - name: Check out
       uses: actions/checkout@v3
     - name: Get dependencies
@@ -54,11 +52,10 @@ jobs:
     name: E2E Test
     runs-on: ubuntu-latest
     steps:
-    - name: Set up Go 1.x
+    - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: ~1.18
-      id: go
+        go-version-file: 'go.mod'
     - name: Check out
       uses: actions/checkout@v3
     - name: Get dependencies
@@ -72,11 +69,10 @@ jobs:
     name: Validate .goreleaser.yml
     runs-on: ubuntu-latest
     steps:
-    - name: Set up Go 1.x
+    - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: ~1.18
-      id: go
+        go-version-file: 'go.mod'
     - name: Check out
       uses: actions/checkout@v3
     - name: Validate

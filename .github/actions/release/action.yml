@@ -26,11 +26,10 @@ runs:
       registry: ghcr.io
       username: everpeace
       password: ${{ inputs.token }}
-  - name: Set up Go 1.x
+  - name: Set up Go
     uses: actions/setup-go@v3
     with:
-      go-version: ~1.18
-    id: go
+      go-version-file: 'go.mod'
   - name: GoReleaser
     uses: goreleaser/goreleaser-action@v3
     with:
