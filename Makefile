@@ -64,11 +64,12 @@ docker-tag:
 #
 DEV_DIR = .dev
 DEV_KUBECONFIG = $(DEV_DIR)/kubeconfig
+KIND_NODE_IMAGE ?= kindest/node:v1.25.3
 .PHONY: dev-cluster
 dev-cluster:
 	helm repo add jetstack https://charts.jetstack.io
 	helm repo update
-	kind get kubeconfig >/dev/null 2>&1 || kind create cluster
+	kind get kubeconfig >/dev/null 2>&1 || kind create cluster --image=$(KIND_NODE_IMAGE)
 	docker exec kind-control-plane sh -c 'mkdir -p /sample && echo "hello" > /sample/hello'
 	mkdir -p $(DEV_DIR) && kind get kubeconfig > $(DEV_KUBECONFIG) && chmod 600 $(DEV_KUBECONFIG)
 	KUBECONFIG=$(DEV_KUBECONFIG) helm status cert-manager --namespace=cert-manager >/dev/null 2>&1 || \
