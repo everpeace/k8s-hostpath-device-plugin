@@ -25,6 +25,6 @@ jobs:
           github.rest.actions.createWorkflowDispatch({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            workflow_id: 'release.yaml',
+            workflow_id: 'release.yml',
             ref: "refs/tags/${{ steps.tagpr.outputs.tag }}",
           })
