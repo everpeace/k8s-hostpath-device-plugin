@@ -1,11 +1,11 @@
 name: Release
 on:
+  # tagged manually  
   push:
-    # tagged manually  
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
-    # dispatch from tagpr.yaml workflow
-    workflow_dispatch:
+  # dispatch from tagpr.yaml workflow
+  workflow_dispatch:
 
 
 jobs:
