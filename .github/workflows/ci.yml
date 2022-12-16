@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
 # Controls when the workflow will run
@@ -26,8 +24,6 @@ jobs:
         go-version-file: 'go.mod'
     - name: Get dependencies
       run: go mod download
-    - name: Get Devtools
-      run: make setup
     - name: Lint
       run : make lint
 
@@ -43,8 +39,6 @@ jobs:
         go-version-file: 'go.mod'
     - name: Get dependencies
       run: go mod download
-    - name: Get Devtools
-      run: make setup
     - name: Unit Test
       run: make test
 
@@ -60,8 +54,6 @@ jobs:
         go-version-file: 'go.mod'
     - name: Get dependencies
       run: go mod download
-    - name: Get Devtools
-      run: make setup
     - name: E2E Test
       run: make e2e-test
 
