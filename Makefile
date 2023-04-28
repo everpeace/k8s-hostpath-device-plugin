@@ -107,7 +107,7 @@ GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v4.3.0
-GOLANGCI_LINT_VERSION ?= v1.50.0
+GOLANGCI_LINT_VERSION ?= v1.52.2
 
 .PHONY: goimports
 goimports: $(GOIMPORTS) ## Download goimports locally if necessary.
