@@ -13,7 +13,5 @@ linters:
     - goimports
     - unconvert
     - misspell
-    - interfacer
-    - maligned
     - prealloc
   fast: false

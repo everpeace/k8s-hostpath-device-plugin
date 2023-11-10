@@ -55,7 +55,7 @@ docker-tag:
 #
 DEV_DIR = .dev
 DEV_KUBECONFIG = $(DEV_DIR)/kubeconfig
-KIND_NODE_IMAGE ?= kindest/node:v1.25.3
+KIND_NODE_IMAGE ?= kindest/node:v1.28.0
 .PHONY: dev-cluster
 dev-cluster: kind helm
 	$(HELM) repo add jetstack https://charts.jetstack.io
@@ -106,8 +106,8 @@ GOIMPORTS ?= $(LOCALBIN)/goimports
 GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 
 ## Tool Versions
-KUSTOMIZE_VERSION ?= v4.3.0
-GOLANGCI_LINT_VERSION ?= v1.52.2
+KUSTOMIZE_VERSION ?= v5.2.1
+GOLANGCI_LINT_VERSION ?= v1.55.2
 
 .PHONY: goimports
 goimports: $(GOIMPORTS) ## Download goimports locally if necessary.
