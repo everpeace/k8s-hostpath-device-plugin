@@ -1,4 +1,4 @@
-FROM golang:1.21 as build
+FROM golang:1.22 as build
 ARG CGO_ENABLED=0
 ARG GOOS=linux
 ARG GOARCH=amd64
@@ -9,6 +9,6 @@ RUN go mod download
 COPY . /workspace
 RUN make build-only
 
-FROM gcr.io/distroless/base-debian10 as runtime
+FROM gcr.io/distroless/base-debian12 as runtime
 COPY --from=build /workspace/dist/k8s-hostpath-device-plugin /bin/k8s-hostpath-device-plugin
 ENTRYPOINT ["/bin/k8s-hostpath-device-plugin"]
