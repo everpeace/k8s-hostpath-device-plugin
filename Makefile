@@ -19,7 +19,7 @@ fmt: goimports
 
 .PHONY: lint
 lint: fmt golangci-lint
-	$(GOLANGCI_LINT) run --config .golangci.yml --deadline 30m
+	$(GOLANGCI_LINT) run --config .golangci.yml --timeout 30m
 
 .PHONY: build
 build: fmt lint
@@ -55,7 +55,7 @@ docker-tag:
 #
 DEV_DIR = .dev
 DEV_KUBECONFIG = $(DEV_DIR)/kubeconfig
-KIND_NODE_IMAGE ?= kindest/node:v1.28.0
+KIND_NODE_IMAGE ?= kindest/node:v1.30.4
 .PHONY: dev-cluster
 dev-cluster: kind helm
 	$(HELM) repo add jetstack https://charts.jetstack.io
@@ -68,7 +68,7 @@ dev-cluster: kind helm
 		cert-manager jetstack/cert-manager \
 		--namespace cert-manager \
 		--create-namespace \
-		--version v1.5.3 \
+		--version v1.15.3 \
 		--set installCRDs=true \
 		--wait
 
@@ -106,8 +106,8 @@ GOIMPORTS ?= $(LOCALBIN)/goimports
 GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 
 ## Tool Versions
-KUSTOMIZE_VERSION ?= v5.2.1
-GOLANGCI_LINT_VERSION ?= v1.55.2
+KUSTOMIZE_VERSION ?= v5.4.3
+GOLANGCI_LINT_VERSION ?= v1.61.0
 
 .PHONY: goimports
 goimports: $(GOIMPORTS) ## Download goimports locally if necessary.

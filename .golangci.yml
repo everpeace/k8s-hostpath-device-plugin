@@ -1,9 +1,9 @@
 run:
   tests: false
-  skip-dirs:
+  exclude-dirs:
   - .dev/
 output:
-  format: colored-line-number
+  formats: colored-line-number
   print-issued-lines: true
   print-linter-name: true
 linters:

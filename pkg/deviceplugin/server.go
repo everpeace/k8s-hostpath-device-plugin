@@ -54,6 +54,8 @@ func NewHostPathDevicePlugin(cfg config.HostPathDevicePluginConfig) (*HostPathDe
 func dial(unixSocketPath string, timeout time.Duration) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
+	// SA1019
+	// nolint:staticcheck
 	c, err := grpc.DialContext(ctx, unixSocketPath, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(),
 		grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
 			var dialer net.Dialer
