@@ -1,3 +1,5 @@
+version: 2
+
 before:
   hooks:
   - go mod download
@@ -60,4 +62,4 @@ docker_manifests:
   - ghcr.io/everpeace/{{ .ProjectName }}:{{ .Version }}-arm64v8
 
 changelog:
-  skip: true
+  disable: true
