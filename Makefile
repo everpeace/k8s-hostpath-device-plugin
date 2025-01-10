@@ -55,7 +55,7 @@ docker-tag:
 #
 DEV_DIR = .dev
 DEV_KUBECONFIG = $(DEV_DIR)/kubeconfig
-KIND_NODE_IMAGE ?= kindest/node:v1.30.4
+KIND_NODE_IMAGE ?= kindest/node:v1.31.4
 .PHONY: dev-cluster
 dev-cluster: kind helm
 	$(HELM) repo add jetstack https://charts.jetstack.io
